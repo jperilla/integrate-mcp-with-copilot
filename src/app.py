@@ -158,7 +158,10 @@ def student_dashboard(email: str = Query(..., description="Student email address
         </header>
         <main>
             <div class='container'>
-                <h3>Dashboard for {email}</h3>
+                <div class="dashboard-header">
+                    <h3>Dashboard for {email}</h3>
+                    <a href='/static/index.html' class='back-home-link'>← Back to Home</a>
+                </div>
                 <section class="enrolled-section">
                     <h4>Enrolled Activities</h4>
                     <div class="enrolled-fullwidth">
@@ -184,7 +187,6 @@ def student_dashboard(email: str = Query(..., description="Student email address
                         for a in not_enrolled]) if not_enrolled else '<p>No available activities.</p>')}
                     </div>
                 </section>
-                <a href='/static/index.html'>Back to Home</a>
             </div>
         </main>
         <footer>

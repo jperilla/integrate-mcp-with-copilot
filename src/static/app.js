@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const spotsLeft =
           details.max_participants - details.participants.length;
 
-        // Create participants HTML with delete icons instead of bullet points
+        // Create participants HTML with delete icons and dashboard links
         const participantsHTML =
           details.participants.length > 0
             ? `<div class="participants-section">
@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${details.participants
                   .map(
                     (email) =>
-                      `<li><span class="participant-email">${email}</span><button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button></li>`
+                      `<li>
+                        <a href="/dashboard?email=${encodeURIComponent(email)}" class="participant-email" title="View ${email}'s dashboard">${email}</a>
+                        <button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button>
+                      </li>`
                   )
                   .join("")}
               </ul>
