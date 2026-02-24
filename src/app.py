@@ -146,21 +146,36 @@ def student_dashboard(email: str = Query(..., description="Student email address
     <html>
     <head>
         <title>Student Dashboard</title>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <link rel='stylesheet' href='/static/styles.css'>
     </head>
     <body>
-        <div class='container'>
-            <h1>Dashboard for {email}</h1>
-            <h2>Enrolled Activities</h2>
-            <ul>
-                {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in enrolled]) or '<li>None</li>'}
-            </ul>
-            <h2>Available Activities</h2>
-            <ul>
-                {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in not_enrolled]) or '<li>None</li>'}
-            </ul>
-            <a href='/static/index.html'>Back to Home</a>
-        </div>
+        <header>
+            <h1>Mergington High School</h1>
+            <h2>Student Dashboard</h2>
+        </header>
+        <main>
+            <div class='container'>
+                <h3>Dashboard for {email}</h3>
+                <section>
+                    <h4>Enrolled Activities</h4>
+                    <ul>
+                        {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in enrolled]) or '<li>None</li>'}
+                    </ul>
+                </section>
+                <section>
+                    <h4>Available Activities</h4>
+                    <ul>
+                        {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in not_enrolled]) or '<li>None</li>'}
+                    </ul>
+                </section>
+                <a href='/static/index.html'>Back to Home</a>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2023 Mergington High School</p>
+        </footer>
     </body>
     </html>
     """
