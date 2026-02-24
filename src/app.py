@@ -143,7 +143,8 @@ def student_dashboard(email: str = Query(..., description="Student email address
         else:
             not_enrolled.append({"name": name, **activity})
     html = f"""
-    <html>
+    <!DOCTYPE html>
+    <html lang='en'>
     <head>
         <title>Student Dashboard</title>
         <meta charset='UTF-8'>
@@ -158,17 +159,30 @@ def student_dashboard(email: str = Query(..., description="Student email address
         <main>
             <div class='container'>
                 <h3>Dashboard for {email}</h3>
-                <section>
+                <section class="enrolled-section">
                     <h4>Enrolled Activities</h4>
-                    <ul>
-                        {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in enrolled]) or '<li>None</li>'}
-                    </ul>
+                    <div class="enrolled-fullwidth">
+                        {(''.join([
+                            f'<div class="card enrolled-card">'
+                            f'<h5>{a["name"]}</h5>'
+                            f'<p>{a["description"]}</p>'
+                            f'<p><b>Schedule:</b> {a["schedule"]}</p>'
+                            f'</div>'
+                        for a in enrolled]) if enrolled else '<p>No enrolled activities.</p>')}
+                    </div>
+                    <hr class="dashboard-divider" />
                 </section>
-                <section>
+                <section class="available-section">
                     <h4>Available Activities</h4>
-                    <ul>
-                        {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in not_enrolled]) or '<li>None</li>'}
-                    </ul>
+                    <div class="card-list available-grid">
+                        {(''.join([
+                            f'<div class="card available-card">'
+                            f'<h5>{a["name"]}</h5>'
+                            f'<p>{a["description"]}</p>'
+                            f'<p><b>Schedule:</b> {a["schedule"]}</p>'
+                            f'</div>'
+                        for a in not_enrolled]) if not_enrolled else '<p>No available activities.</p>')}
+                    </div>
                 </section>
                 <a href='/static/index.html'>Back to Home</a>
             </div>
