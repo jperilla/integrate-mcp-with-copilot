@@ -5,9 +5,9 @@ A super simple FastAPI application that allows students to view and sign up
 for extracurricular activities at Mergington High School.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 import os
 from pathlib import Path
 
@@ -130,3 +130,38 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def student_dashboard(email: str = Query(..., description="Student email address")):
+    """Personalized dashboard for a student to view their activities."""
+    enrolled = []
+    not_enrolled = []
+    for name, activity in activities.items():
+        if email in activity["participants"]:
+            enrolled.append({"name": name, **activity})
+        else:
+            not_enrolled.append({"name": name, **activity})
+    html = f"""
+    <html>
+    <head>
+        <title>Student Dashboard</title>
+        <link rel='stylesheet' href='/static/styles.css'>
+    </head>
+    <body>
+        <div class='container'>
+            <h1>Dashboard for {email}</h1>
+            <h2>Enrolled Activities</h2>
+            <ul>
+                {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in enrolled]) or '<li>None</li>'}
+            </ul>
+            <h2>Available Activities</h2>
+            <ul>
+                {''.join([f'<li><b>{a['name']}</b>: {a['description']} ({a['schedule']})</li>' for a in not_enrolled]) or '<li>None</li>'}
+            </ul>
+            <a href='/static/index.html'>Back to Home</a>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
