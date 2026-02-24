@@ -5,9 +5,9 @@ A super simple FastAPI application that allows students to view and sign up
 for extracurricular activities at Mergington High School.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 import os
 from pathlib import Path
 
@@ -130,3 +130,69 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def student_dashboard(email: str = Query(..., description="Student email address")):
+    """Personalized dashboard for a student to view their activities."""
+    enrolled = []
+    not_enrolled = []
+    for name, activity in activities.items():
+        if email in activity["participants"]:
+            enrolled.append({"name": name, **activity})
+        else:
+            not_enrolled.append({"name": name, **activity})
+    html = f"""
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <title>Student Dashboard</title>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <link rel='stylesheet' href='/static/styles.css'>
+    </head>
+    <body>
+        <header>
+            <h1>Mergington High School</h1>
+            <h2>Student Dashboard</h2>
+        </header>
+        <main>
+            <div class='container'>
+                <div class="dashboard-header">
+                    <h3>Dashboard for {email}</h3>
+                    <a href='/static/index.html' class='back-home-link'>← Back to Home</a>
+                </div>
+                <section class="enrolled-section">
+                    <h4>Enrolled Activities</h4>
+                    <div class="enrolled-fullwidth">
+                        {(''.join([
+                            f'<div class="card enrolled-card">'
+                            f'<h5>{a["name"]}</h5>'
+                            f'<p>{a["description"]}</p>'
+                            f'<p><b>Schedule:</b> {a["schedule"]}</p>'
+                            f'</div>'
+                        for a in enrolled]) if enrolled else '<p>No enrolled activities.</p>')}
+                    </div>
+                    <hr class="dashboard-divider" />
+                </section>
+                <section class="available-section">
+                    <h4>Available Activities</h4>
+                    <div class="card-list available-grid">
+                        {(''.join([
+                            f'<div class="card available-card">'
+                            f'<h5>{a["name"]}</h5>'
+                            f'<p>{a["description"]}</p>'
+                            f'<p><b>Schedule:</b> {a["schedule"]}</p>'
+                            f'</div>'
+                        for a in not_enrolled]) if not_enrolled else '<p>No available activities.</p>')}
+                    </div>
+                </section>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2023 Mergington High School</p>
+        </footer>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
